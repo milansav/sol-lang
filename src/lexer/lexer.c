@@ -28,7 +28,6 @@ LexemeArr* lexer_start(char* code)
     while(*curr() != _EOF)
     {
         char _c = *curr();
-        while(is_whitespace(_c)) next();
         while(_c == '\n')
         {
             _col++;
@@ -36,29 +35,51 @@ LexemeArr* lexer_start(char* code)
             _row = 0;
         }
 
-        if(_c == '#') lexer_skip_comments();
-        
-        /*Checking if first character of a word is alphabet but not a number*/
-        if(is_identifier(_c) && !is_number(_c)) lexemearr_add(la, lexer_identifier());
-        
-        if(is_number(_c)) lexemearr_add(la, lexer_number()); 
+        while(is_whitespace(*peek())) next();
 
+        if(_c == '#')   lexer_skip_comments();
+        if(_c == '"')   lexemearr_add(la, lexer_string());
+        if(_c == '\'')  lexemearr_add(la, lexer_char());
+
+        /*Checking if first character of a word is alphabet but not a number*/
+        if(is_identifier(_c) && !is_number(_c)) lexemearr_add(la, lexer_identifier());       
+        if(is_number(_c)) lexemearr_add(la, lexer_number()); 
+        if(is_operator(_c)) lexemearr_add(la, lexer_operator());
+        
         next();
     }
 
     return la;
 }
 
-//TBD
 static void lexer_skip_comments()
 {
-
+    while(*curr() != '\n') next();
+    next();
+    _col++;
+    _row = 0;
 }
 
-//TBD
+//TBD set l.type
 static Lexeme lexer_identifier()
 {
     Lexeme l;
+    char* start     = curr();
+    
+    while(is_identifier(*curr())) next();
+
+    char* end       = curr();
+    u8 length       = end-start;
+
+    char* label     = malloc(length+1);
+    label[length]   = 0;
+    
+    strncpy(label, start, length);
+
+    //TODO: if the label is a keyword, return lexer_keyword()
+    l = lexeme_create(IDENT, label, _col, _row);
+
+     //printf("Lexeme Identifier: .%s.\n", l.label);
 
     return l;
 }
@@ -75,7 +96,22 @@ static Lexeme lexer_keyword()
 static Lexeme lexer_number()
 {
     Lexeme l;
+    char* start     = curr();
     
+    while(is_number(*curr())) next();
+
+    char* end       = curr();
+    u8 length       = end-start;
+
+    char* label     = malloc(length+1);
+    label[length]   = 0;
+
+    strncpy(label, start, length);    
+
+    l = lexeme_create(NUM, label, _col, _row);
+
+    //printf("Lexeme Number: .%s.\n", l.label);
+
     return l;
 }
 
@@ -83,6 +119,24 @@ static Lexeme lexer_number()
 static Lexeme lexer_string()
 {
     Lexeme l;
+    
+    next(); //Skip first "
+
+    char* start     = curr();
+
+    while(*curr() != '"') next();
+
+    char* end       = curr();
+    u8 length       = end-start;
+
+    char* label     = malloc(length+1);
+    label[length]   = 0;
+
+    strncpy(label, start, length);
+
+    l = lexeme_create(STR, label, _col, _row);
+
+    next(); //Skip last "
 
     return l;
 }
