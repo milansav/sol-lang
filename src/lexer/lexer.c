@@ -14,9 +14,16 @@ static char* curr()
     return _code;
 }
 
+static void new_line()
+{
+    _col = 0;
+    _row++;
+    next();
+}
+
 static void next()
 {
-    _row++;
+    _col++;
     _code++;
 }
 
@@ -24,145 +31,255 @@ LexemeArr* lexer_start(char* code)
 {
     LexemeArr* la = lexemearr_create();
     _code = code;
-
-    while(*curr() != _EOF)
+    
+    while(*curr() != '\0')
     {
-        char _c = *curr();
-        while(_c == '\n')
+
+        if(*curr() == '\n')
         {
-            _col++;
-            next();
-            _row = 0;
+            new_line();
+            continue;
         }
 
-        while(is_whitespace(*peek())) next();
+        if(is_whitespace(*curr()))
+        {
+            next();
+            continue;
+        }
 
-        if(_c == '#')   lexer_skip_comments();
-        if(_c == '"')   lexemearr_add(la, lexer_string());
-        if(_c == '\'')  lexemearr_add(la, lexer_char());
-
-        /*Checking if first character of a word is alphabet but not a number*/
-        if(is_identifier(_c) && !is_number(_c)) lexemearr_add(la, lexer_identifier());       
-        if(is_number(_c)) lexemearr_add(la, lexer_number()); 
-        if(is_operator(_c)) lexemearr_add(la, lexer_operator());
-        
-        next();
+        if(is_identifier(*curr()) && !is_number(*curr()))
+        {
+            lexemearr_add(la, lexer_identifier());
+            continue;
+        }
+        else if(is_number(*curr()))
+        {
+            lexemearr_add(la, lexer_number());
+            continue;
+        }
+        else if(is_operator(*curr()))
+        {
+            lexemearr_add(la, lexer_operator());
+            continue;
+        }
+        else if(*curr() == '"')
+        {
+            lexemearr_add(la, lexer_string());
+            continue;
+        }
+        else if(*curr() == '\'')
+        {
+            lexemearr_add(la, lexer_char());
+            continue;
+        }
+        else if(*curr() == '#')
+        {
+            lexer_skip_comments();
+            continue;
+        }
+        else
+        {
+            lexemearr_add(la, lexer_other());
+            continue;
+        }
     }
+
+    lexemearr_add(la, lexeme_create(END, "", -1, -1));
 
     return la;
 }
 
-static void lexer_skip_comments()
-{
-    while(*curr() != '\n') next();
-    next();
-    _col++;
-    _row = 0;
-}
-
-//TBD set l.type
+//TODO: distinguish different keyword types
 static Lexeme lexer_identifier()
 {
     Lexeme l;
-    char* start     = curr();
-    
+
+    char* start = curr();
+
     while(is_identifier(*curr())) next();
 
-    char* end       = curr();
-    u8 length       = end-start;
+    char* end = curr();
+    u8 length = end-start;
 
-    char* label     = malloc(length+1);
-    label[length]   = 0;
-    
+    char* label = malloc(length+1);
+    label[length] = 0;
+
     strncpy(label, start, length);
 
-    //TODO: if the label is a keyword, return lexer_keyword()
     l = lexeme_create(IDENT, label, _col, _row);
 
-     //printf("Lexeme Identifier: .%s.\n", l.label);
+    l = lexer_keyword(l);
 
     return l;
 }
 
-//TBD
-static Lexeme lexer_keyword()
+static Lexeme lexer_keyword(Lexeme l)
 {
-    Lexeme l;
+    int i = IF; //IF is a starting point for keywords in keywords enum (lexeme.h)
+    for(i = 0; i < KEYWORDS_COUNT; i++)
+    {
+        if(!strcmp(l.label, keywords[i]))
+        {
+            printf("%s: is a keyword.\n", l.label);
+            l.type = i;
+            break;
+        } 
+    }
 
     return l;
 }
 
-//TBD
 static Lexeme lexer_number()
 {
     Lexeme l;
-    char* start     = curr();
-    
+
+    char* start = curr();
+
     while(is_number(*curr())) next();
 
-    char* end       = curr();
-    u8 length       = end-start;
+    char* end = curr();
+    u8 length = end-start; 
 
-    char* label     = malloc(length+1);
-    label[length]   = 0;
+    char* label = malloc(length+1);
+    label[length] = 0;
 
-    strncpy(label, start, length);    
+    strncpy(label, start, length);
 
     l = lexeme_create(NUM, label, _col, _row);
-
-    //printf("Lexeme Number: .%s.\n", l.label);
 
     return l;
 }
 
-//TBD
+//TODO: distinguish different operator types
+static Lexeme lexer_operator()
+{
+    Lexeme l;
+
+    char* start = curr();
+
+    while(is_operator(*curr())) next();
+
+    char* end = curr();
+    u8 length = end-start;
+
+    char* label = malloc(length+1);
+    label[length] = 0;
+
+    strncpy(label, start, length);
+
+    l = lexeme_create(SUM, label, _col, _row);
+
+    return l;
+}
+
+static Lexeme lexer_char()
+{
+    Lexeme l;
+
+    next(); //Skip initial '
+
+    char* start = curr();
+
+    while(*curr() != '\'') next();
+
+    char* end = curr();
+    u8 length = end-start; 
+
+    char* label = malloc(length+1);
+    label[length] = 0;
+
+    strncpy(label, start, length);
+
+    if(length > 1)
+    {
+        l = lexeme_create(INVALID, label, _col, _row);
+        return l;
+    }
+
+    l = lexeme_create(CHAR, label, _col, _row);
+
+    next(); //Skip final '
+
+    return l;
+}
+
 static Lexeme lexer_string()
 {
     Lexeme l;
-    
-    next(); //Skip first "
 
-    char* start     = curr();
+    next(); //Skip initial "
+
+    char* start = curr();
 
     while(*curr() != '"') next();
 
-    char* end       = curr();
-    u8 length       = end-start;
+    char* end = curr();
+    u8 length = end-start;
 
-    char* label     = malloc(length+1);
-    label[length]   = 0;
+    char* label = malloc(length+1);
+    label[length] = 0;
 
     strncpy(label, start, length);
 
     l = lexeme_create(STR, label, _col, _row);
 
-    next(); //Skip last "
+    next(); //Skip final "
 
     return l;
 }
 
-//TBD
-static Lexeme lexer_char()
-{
-    Lexeme l;
-
-    return l;
-}
-
-//TBD
 static Lexeme lexer_other()
 {
     Lexeme l;
 
+    char c = *curr();
+    char* start = curr();
+    char* label = malloc(2);
+    label[1] = '\0';
+    strncpy(label, start, 1);
+    
+    switch(c)
+    {
+        case '(':
+            l = lexeme_create(LPAREN, label, _col, _row);
+            break;
+        case ')':
+            l = lexeme_create(RPAREN, label, _col, _row);
+            break;
+        case '{':
+            l = lexeme_create(LCRLBRACKET, label, _col, _row);
+            break;
+        case '}':
+            l = lexeme_create(RCRLBRACKET, label, _col, _row);
+            break;
+        case '[':
+            l = lexeme_create(LBRACKET, label, _col, _row);
+            break;
+        case ']':
+            l = lexeme_create(RBRACKET, label, _col, _row);
+            break;
+        case '.':
+            l = lexeme_create(PERIOD, label, _col, _row);
+            break;
+        case ':':
+            l = lexeme_create(COLON, label, _col, _row);
+            break;
+        case ';':
+            l = lexeme_create(SEMICOLON, label, _col, _row);
+            break;
+        case '?':
+            l = lexeme_create(QUERY, label, _col, _row);
+            break;
+    }
+
+    next();
+
     return l;
 }
 
-//TBD
-static Lexeme lexer_operator()
+static void lexer_skip_comments()
 {
-    Lexeme l;
-
-    return l;
+    while(*curr() != '\n') next();
 }
 
 static int is_identifier(char c)

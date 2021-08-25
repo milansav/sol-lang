@@ -9,15 +9,15 @@
 
 typedef enum {
     //Binary ops
-    SUM, SUB, MUL, DIV, MOD, ASIGN, POW,
+    SUM, SUB, MUL, DIV, MOD, ASSIGN, POW,
     //Bitwise ops
     AND, OR,
     //Parentheses
     LPAREN, RPAREN, LBRACKET, RBRACKET, LCRLBRACKET, RCRLBRACKET,
     //Deco
-    PERIOD, SEMICOLON, COLON, QUERY, QUOTE, SQUOTE,
+    PERIOD, SEMICOLON, COLON, QUERY, 
     //Keywords
-    IF, ELSE, FN,
+    IF, ELSEIF, ELSE, FN, STRUCT, IMPORT,
     //Literals
     NUM, STR, CHAR, IDENT,
     //Math
