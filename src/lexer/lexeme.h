@@ -2,9 +2,10 @@
 #define LEXEME_H
 
 #include <stdlib.h>
+#include <stdio.h>
 #include "../common/common.h"
 
-#define LA_DEFAULT_SIZE 16 //Default LexemeArr size
+#define LA_DEFAULT_SIZE 32 //Default LexemeArr size
 #define LA_DEFAULT_INC  16 //Default LexemeArr size increase constant
 
 typedef enum {
@@ -34,16 +35,17 @@ typedef struct {
     u8          row;        //Row at which lexeme starts
 } Lexeme;
 
-/*Dynamic array of Lexemes*/
 typedef struct {
-    u8          size;       //Size in memory
-    u8          count;      //Count of elements in array
-    Lexeme*     arr;        //Array of lexemes
+    unsigned int size;
+    unsigned int count;
+    Lexeme* arr;
 } LexemeArr;
 
 Lexeme lexeme_create(Type type, char* label, u8 col, u8 row);
+void lexeme_remove(Lexeme* l);
 
-LexemeArr* lexemearr_create(void);
+LexemeArr* lexemearr_create();
 void lexemearr_add(LexemeArr* la, Lexeme l);
+void lexemearr_remove(LexemeArr* la);
 
 #endif

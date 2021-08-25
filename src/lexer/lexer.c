@@ -120,7 +120,6 @@ static Lexeme lexer_keyword(Lexeme l)
     {
         if(!strcmp(l.label, keywords[i]))
         {
-            printf("%s: is a keyword.\n", l.label);
             l.type = i;
             break;
         } 
@@ -128,7 +127,6 @@ static Lexeme lexer_keyword(Lexeme l)
 
     return l;
 }
-
 static Lexeme lexer_number()
 {
     Lexeme l;
@@ -187,7 +185,7 @@ static Lexeme lexer_char()
 
     char* label = malloc(length+1);
     label[length] = 0;
-
+    
     strncpy(label, start, length);
 
     if(length > 1)
