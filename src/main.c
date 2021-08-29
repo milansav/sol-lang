@@ -1,4 +1,5 @@
 #include "./lexer/lexer.h"
+#include "./lexer/lexeme.h"
 #include <stdio.h>
 
 int main(int argc, char* argv[])
@@ -9,6 +10,8 @@ int main(int argc, char* argv[])
     {
         printf("%s\n", la->arr[i].label);
     }
+
+    lexemearr_remove(la);
 
     return 0;
 }

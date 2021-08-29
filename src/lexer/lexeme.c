@@ -12,11 +12,6 @@ Lexeme lexeme_create(Type type, char* label, u8 col, u8 row)
     return l;
 }
 
-void lexeme_remove(Lexeme* l)
-{
-    free(l->label);
-}
-
 LexemeArr* lexemearr_create()
 {
     LexemeArr* la = malloc(sizeof(LexemeArr));
@@ -43,9 +38,9 @@ void lexemearr_add(LexemeArr* la, Lexeme l)
 
 void lexemearr_remove(LexemeArr* la)
 {
-    for(u8 i = 0; i < la->count; i++)
+    for(u8 i = 0; la->arr[i].type != END; i++)
     {
-        lexeme_remove(&la->arr[i]);
+        free(la->arr[i].label);
     }
 
     free(la->arr);

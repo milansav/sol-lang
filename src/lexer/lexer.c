@@ -165,7 +165,201 @@ static Lexeme lexer_operator()
 
     strncpy(label, start, length);
 
-    l = lexeme_create(SUM, label, _col, _row);
+    switch(label[0])
+    {
+        case '+':
+            if(length > 1)
+            {
+                switch(label[1])
+                {
+                    case '+':
+                        l = lexeme_create(INC, label, _col, _row);
+                        return l;
+                        break;
+                    default:
+                        l = lexeme_create(INVALID, label, _col, _row);
+                        return l;
+                        break;
+                }
+            }
+            else
+            {
+                l = lexeme_create(INVALID, label, _col, _row);
+                return l;
+            }
+
+            l = lexeme_create(SUM, label, _col, _row);
+            return l;
+
+            break;
+        case '-':
+            if(length > 1)
+            {
+                switch(label[1])
+                {
+                    case '-':
+                        l = lexeme_create(DEC, label, _col, _row);
+                        return l;
+                        break;
+                    default:
+                        l = lexeme_create(INVALID, label, _col, _row);
+                        return l;
+                        break;
+                }
+            }
+            else
+            {
+                l = lexeme_create(INVALID, label, _col, _row);
+                return l;
+            }
+
+            l = lexeme_create(SUB, label, _col, _row);
+            return l;
+
+            break;
+        case '*':
+            if(length > 1)
+            {
+                switch(label[1])
+                {
+                    case '*':
+                        l = lexeme_create(POW, label, _col, _row);
+                        return l;
+                        break;
+                    default:
+                        l = lexeme_create(INVALID, label, _col, _row);
+                        return l;
+                        break;
+                }
+            }
+            else
+            {
+                l = lexeme_create(INVALID, label, _col, _row);
+                return l;
+            }
+            
+            l = lexeme_create(MUL, label, _col, _row);
+            return l;
+
+            break;
+        case '/':
+            if(length > 1)
+            {
+                switch(label[1])
+                {
+                    case '/':
+                        l = lexeme_create(DIVT, label, _col, _row);
+                        return l;
+                        break;
+                    default:
+                        l = lexeme_create(INVALID, label, _col, _row);
+                        return l;
+                        break;
+                }
+            }
+            else
+            {
+                l = lexeme_create(INVALID, label, _col, _row);
+                return l;
+            }
+
+            l = lexeme_create(DIV, label, _col, _row);
+            return l;
+
+            break;
+        case '=':
+            if(length > 1)
+            {
+                switch(label[1])
+                {
+                    case '=':
+                        l = lexeme_create(EQL, label, _col, _row);
+                        return l;
+                        break;
+                    default:
+                        l = lexeme_create(INVALID, label, _col, _row);
+                        return l;
+                        break;
+                }
+            }
+            else
+            {
+                l = lexeme_create(INVALID, label, _col, _row);
+               return l; 
+            }
+
+            l = lexeme_create(ASSIGN, label, _col, _row);
+            return l;
+
+            break;
+        case '!':
+            if(length > 1)
+            {
+                switch(label[1])
+                {
+                    case '=':
+                        l = lexeme_create(NQL, label, _col, _row);
+                        return l;
+                        break;
+                    default:
+                        l = lexeme_create(INVALID, label, _col, _row);
+                        return l;
+                        break;
+                }
+            }
+            
+            l = lexeme_create(NOT, label, _col, _row);
+            return l;
+
+            break;
+        case '^':
+            if(length > 1)
+            {
+                l = lexeme_create(INVALID, label, _col, _row);
+                return l;
+            }
+
+            l = lexeme_create(POW, label, _col, _row);
+            return l;
+
+            break;
+        case '&':
+            if(length > 1)
+            {
+                l = lexeme_create(INVALID, label, _col, _row);
+                return l;
+            }
+
+            l = lexeme_create(AND, label, _col, _row);
+            return l;
+
+            break;
+        case '|':
+            if(length > 1)
+            {
+                l = lexeme_create(INVALID, label, _col, _row);
+                return l;
+            }
+
+            l = lexeme_create(OR, label, _col, _row);
+            return l;
+
+            break;
+        case '~':
+            if(length > 1)
+            {
+                l = lexeme_create(INVALID, label, _col, _row);
+                return l;
+            }
+
+            l = lexeme_create(XOR, label, _col, _row);
+            return l;
+
+            break;
+
+    }
+
+    l = lexeme_create(INVALID, label, _col, _row);
 
     return l;
 }

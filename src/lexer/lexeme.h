@@ -10,9 +10,10 @@
 
 typedef enum {
     //Binary ops
-    SUM, SUB, MUL, DIV, MOD, ASSIGN, POW,
+    SUM, SUB, MUL, DIV, DIVT, MOD, ASSIGN, POW,
+    INC, DEC,
     //Bitwise ops
-    AND, OR,
+    AND, OR, NOT, XOR,
     //Parentheses
     LPAREN, RPAREN, LBRACKET, RBRACKET, LCRLBRACKET, RCRLBRACKET,
     //Deco
@@ -42,7 +43,6 @@ typedef struct {
 } LexemeArr;
 
 Lexeme lexeme_create(Type type, char* label, u8 col, u8 row);
-void lexeme_remove(Lexeme* l);
 
 LexemeArr* lexemearr_create();
 void lexemearr_add(LexemeArr* la, Lexeme l);
