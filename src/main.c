@@ -60,8 +60,11 @@ void load_args(int argc, char* argv[])
                 i++;
                 while(i < argc)
                 {
-                    if(argv[i+1][0] == '-')
+                    if(argv[i][0] == '-')
+                    {
+                        i--;
                         break;
+                    }
                     File f = file_construct(argv[i]);
                     filearr_add(&files, f);
                     i++;
