@@ -1,8 +1,32 @@
 #include "lexer.h"
 
+//TODO: Update lexeme column and row counting (currenctly lexemes positions are marked at the end of the lexeme instead of the start)
+
 static char* _code;
 static u8 _col;
 static u8 _row;
+
+static char* peek(); /*Returns next possible character*/
+static char* curr(); /*Returns current possible character*/
+static void next(); /*Skips to next possible character*/
+static void new_line(); /*Resets col, increments row, and goes to next character*/
+
+static void lexer_skip_comments(); /*It just skips comments*/
+static void lexer_new_line(); /*Loops checking for \n, calls new_line everytime \n is found*/
+
+static Lexeme lexer_identifier(); /*Lexes words starting with a-zA-Z characters, if keyword is detected lexer_keyword is called*/
+static Lexeme lexer_keyword(Lexeme l); /*Takes identifier lexeme as input, if the lexeme isn't a keyword, returns the same lexeme, otherwise it changes its properties'*/
+static Lexeme lexer_number();
+static Lexeme lexer_string();
+static Lexeme lexer_char();
+static Lexeme lexer_other(); /*Lexes text starting with misc characters, can call lexer_operator if an operator is detected*/
+static Lexeme lexer_operator();
+static Lexeme lexer_other();
+
+static int is_identifier(char c);
+static int is_number(char c);
+static int is_operator(char c);
+static int is_whitespace(char c);
 
 static char* peek()
 {
@@ -31,6 +55,8 @@ LexemeArr* lexer_start(char* code)
 {
     LexemeArr* la = lexemearr_create();
     _code = code;
+    _row = 0;
+    _col = 0;
     
     while(*curr() != '\0')
     {
@@ -84,12 +110,11 @@ LexemeArr* lexer_start(char* code)
         }
     }
 
-    lexemearr_add(la, lexeme_create(END, "", -1, -1));
+    lexemearr_add(la, lexeme_create(END, "End", -1, -1));
 
     return la;
 }
 
-//TODO: distinguish different keyword types
 static Lexeme lexer_identifier()
 {
     Lexeme l;
@@ -116,9 +141,9 @@ static Lexeme lexer_identifier()
 static Lexeme lexer_keyword(Lexeme l)
 {
     int i = IF; //IF is a starting point for keywords in keywords enum (lexeme.h)
-    for(i = 0; i < KEYWORDS_COUNT; i++)
+    for(i; i < NUM; i++) //NUM is ending point for keywords in keywords enum
     {
-        if(!strcmp(l.label, keywords[i]))
+        if(!strcmp(l.label, keywords[i-IF])) //i needs to be normalized for access in keywords
         {
             l.type = i;
             break;
@@ -148,7 +173,6 @@ static Lexeme lexer_number()
     return l;
 }
 
-//TODO: distinguish different operator types
 static Lexeme lexer_operator()
 {
     Lexeme l;
@@ -182,11 +206,6 @@ static Lexeme lexer_operator()
                         break;
                 }
             }
-            else
-            {
-                l = lexeme_create(INVALID, label, _col, _row);
-                return l;
-            }
 
             l = lexeme_create(SUM, label, _col, _row);
             return l;
@@ -206,11 +225,6 @@ static Lexeme lexer_operator()
                         return l;
                         break;
                 }
-            }
-            else
-            {
-                l = lexeme_create(INVALID, label, _col, _row);
-                return l;
             }
 
             l = lexeme_create(SUB, label, _col, _row);
@@ -232,11 +246,6 @@ static Lexeme lexer_operator()
                         break;
                 }
             }
-            else
-            {
-                l = lexeme_create(INVALID, label, _col, _row);
-                return l;
-            }
             
             l = lexeme_create(MUL, label, _col, _row);
             return l;
@@ -257,11 +266,6 @@ static Lexeme lexer_operator()
                         break;
                 }
             }
-            else
-            {
-                l = lexeme_create(INVALID, label, _col, _row);
-                return l;
-            }
 
             l = lexeme_create(DIV, label, _col, _row);
             return l;
@@ -281,11 +285,6 @@ static Lexeme lexer_operator()
                         return l;
                         break;
                 }
-            }
-            else
-            {
-                l = lexeme_create(INVALID, label, _col, _row);
-               return l; 
             }
 
             l = lexeme_create(ASSIGN, label, _col, _row);
@@ -461,6 +460,12 @@ static Lexeme lexer_other()
             break;
         case '?':
             l = lexeme_create(QUERY, label, _col, _row);
+            break;
+        case ',':
+            l = lexeme_create(COMMA, label, _col, _row);
+            break;
+        default:
+            l = lexeme_create(INVALID, label, _col, _row);
             break;
     }
 

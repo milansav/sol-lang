@@ -3,8 +3,14 @@
 
 #include "../lexer/lexeme.h"
 #include "../common/common.h"
+#include "../common/keywords.h"
+#include "../common/debug.h"
 
 typedef int Symbol;
+
+typedef enum {
+    node
+} NodeType;
 
 typedef struct node {
 
@@ -16,17 +22,11 @@ typedef struct ast {
     Node* arr;
 } Ast;
 
-Ast* parser_create_ast(LexemeArr* l);
+Ast* ast_construct(void);
+void ast_deconstruct(Ast* ast);
 
-static Node block();
-static Node statement();
-static Node expression();
-static Node condition();
-static Node term();
-static Node factor();
+void ast_append_node(Ast* ast, Node node);
 
-static void next();
-static Symbol curr_s();
-static int check(Symbol s);
-static int expect(Symbol s);
+Ast* parser_start(LexemeArr* l);
+
 #endif

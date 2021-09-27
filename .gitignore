@@ -1,3 +1,6 @@
 *.o
 *.out
 build/
+test.sol
+test2.sol
+.VSCodeCounter/

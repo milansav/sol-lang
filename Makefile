@@ -1,22 +1,41 @@
 all: build
 
-debug: build/main.o build/lexer.o build/lexeme.o build/keywords.o
-	gcc -o sol.out -g build/main.o build/lexer.o build/lexeme.o build/keywords.o
+CC = gcc
+CFLAGS = -O2 -std=c99
+
+bd = build/
+objects = $(bd)main.o $(bd)lexer.o $(bd)lexeme.o $(bd)keywords.o $(bd)parser.o $(bd)debug.o $(bd)file.o
+
+debug: $(objects)
+	$(CC) -o sol -g $(objects)
 
 clean:
-	rm *.o
+	rm $(bd)*.o
+	rm $(bd)sol
 
-build: build/main.o build/lexer.o build/lexeme.o build/keywords.o
-	gcc -o sol.out build/main.o build/lexer.o build/lexeme.o build/keywords.o 
+build: $(objects)
+	$(CC) -o $(bd)sol $(objects)
 
-build/main.o: src/main.c
-	gcc -c src/main.c -o build/main.o -O2 -std=c99 
+%/main.o: src/main.c
+	$(CC) -c $< $(CFLAGS) -o $@
 
-build/lexer.o: src/lexer/lexer.c
-	gcc -c src/lexer/lexer.c -o build/lexer.o -O2 -std=c99 
+%/lexer.o: src/lexer/lexer.c
+	$(CC) -c $< $(CFLAGS) -o $@
 
-build/lexeme.o: src/lexer/lexeme.c
-	gcc -c src/lexer/lexeme.c -o build/lexeme.o -O2 -std=c99 
+%/lexeme.o: src/lexer/lexeme.c
+	$(CC) -c $< $(CFLAGS) -o $@
 
-build/keywords.o: src/common/keywords.c
-	gcc -c src/common/keywords.c -o build/keywords.o -O2 -std=c99 
+%/keywords.o: src/common/keywords.c
+	$(CC) -c $< $(CFLAGS) -o $@
+
+%/parser.o: src/parser/parser.c
+	$(CC) -c $< $(CFLAGS) -o $@
+
+%/debug.o: src/common/debug.c
+	$(CC) -c $< $(CFLAGS) -o $@
+
+%/file.o: src/util/file.c
+	$(CC) -c $< $(CFLAGS) -o $@
+
+install: build
+	cp build/sol /usr/bin/sol
