@@ -201,11 +201,57 @@ static void let_declaration()
 
 		if(accept(ASSIGN))
 		{
-			expect(NUM);
 
-			if(curr_sym == SUM || curr_sym == SUB || curr_sym == MUL || curr_sym == DIV)
+			if(accept(NUM))
 			{
-				expression();
+
+				if(curr_sym == SUM || curr_sym == SUB || curr_sym == MUL || curr_sym == DIV)
+				{
+					expression();
+				}
+			}
+			else if(accept(CHAR))
+			{
+				if(curr_sym == SUM || curr_sym == SUB || curr_sym == MUL || curr_sym == DIV)
+				{
+					expression();
+				}
+			}
+			else if(accept(STR))
+			{
+				if(accept(SUM))
+				{
+					do
+					{
+						if(accept(STR) || accept(CHAR))
+						{
+						}
+						else
+						{
+							if(g_comp_debug_mode(OUTPUT_ALL | OUTPUT_PARSER | OUTPUT_DEBUG))
+							{
+								g_error("parser.c : let_declaration: syntax error, unexpected symbol at: ");
+								printf("%d:%d ", curr_lexeme.row, curr_lexeme.column);
+								g_error(": Type: ");
+								printf("%s", TypeString[curr_sym]);
+								g_error(" Label: ");
+								printf("%s\n", curr_lexeme.label);
+							}
+						}
+					} while (accept(SUM));
+				}
+			}
+			else
+			{
+				if(g_comp_debug_mode(OUTPUT_ALL | OUTPUT_PARSER | OUTPUT_DEBUG))
+				{
+					g_error("parser.c : let_declaration: syntax error, unexpected symbol at: ");
+					printf("%d:%d ", curr_lexeme.row, curr_lexeme.column);
+					g_error(": Type: ");
+					printf("%s", TypeString[curr_sym]);
+					g_error(" Label: ");
+					printf("%s\n", curr_lexeme.label);
+				}
 			}
 		}
 
@@ -228,7 +274,7 @@ static void expression()
 {
 	if(g_comp_debug_mode(OUTPUT_ALL | OUTPUT_PARSER))
 	{
-		g_logln("parser.c : expression");
+		g_log("parser.c : expression");
 		printf(" Type: %s Label: %s\n", TypeString[curr_sym], curr_lexeme.label);
 	}
 
@@ -285,7 +331,7 @@ static void term()
 {
 	if(g_comp_debug_mode(OUTPUT_ALL | OUTPUT_PARSER))
 	{
-		g_logln("parser.c : term");
+		g_log("parser.c : term");
 		printf(" Type: %s Label: %s\n", TypeString[curr_sym], curr_lexeme.label);
 	}
 
@@ -302,7 +348,7 @@ static void factor()
 
 	if(g_comp_debug_mode(OUTPUT_ALL | OUTPUT_PARSER))
 	{
-		g_logln("parser.c : factor");
+		g_log("parser.c : factor");
 		printf(" Type: %s Label: %s\n", TypeString[curr_sym], curr_lexeme.label);
 	}
 
@@ -311,6 +357,10 @@ static void factor()
 		return;
 	}
 	else if(accept(NUM))
+	{
+		return;
+	}
+	else if(accept(CHAR))
 	{
 		return;
 	}
