@@ -19,7 +19,7 @@ Lexeme lexeme_create(Type type, char* label, u8 col, u8 row)
     return l;
 }
 
-LexemeArr* lexemearr_create()
+LexemeArr* lexemearr_construct()
 {
     LexemeArr* la = malloc(sizeof(LexemeArr));
 
@@ -56,13 +56,13 @@ void lexemearr_add(LexemeArr* la, Lexeme l)
     la->count++;
 }
 
-void lexemearr_remove(LexemeArr* la)
+void lexemearr_deconstruct(LexemeArr* la)
 {
     if(!la)
     {
         if(g_comp_debug_mode(OUTPUT_ALL | OUTPUT_LEXER))
         {
-            g_logln("lexeme.c : lexemearr_remove: Nothing to deconstruct");
+            g_logln("lexeme.c : lexemearr_deconstruct: Nothing to deconstruct");
         }
         return;
     }
@@ -70,7 +70,7 @@ void lexemearr_remove(LexemeArr* la)
     {
         if(g_comp_debug_mode(OUTPUT_ALL | OUTPUT_LEXER))
         {
-            g_logln("lexeme.c : lexemearr_remove: Nothing to deconstruct");
+            g_logln("lexeme.c : lexemearr_deconstruct: Nothing to deconstruct");
         }
         return;
     }

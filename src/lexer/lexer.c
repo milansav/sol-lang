@@ -53,7 +53,7 @@ static void next()
 
 LexemeArr* lexer_start(char* code)
 {
-    LexemeArr* la = lexemearr_create();
+    LexemeArr* la = lexemearr_construct();
     _code = code;
     _row = 0;
     _col = 0;

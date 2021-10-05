@@ -6,8 +6,6 @@
 #include "../common/common.h"
 #include "../common/debug.h"
 
-//TODO: rename lexemearr_create to lexemearr_construct & lexemearr_remove to lexemearr_deconstruct
-
 #define LA_DEFAULT_SIZE 32 //Default LexemeArr size
 #define LA_DEFAULT_INC  16 //Default LexemeArr size increase constant
 
@@ -62,8 +60,8 @@ typedef struct {
 Lexeme lexeme_create(Type type, char* label, u8 col, u8 row);
 void lexeme_deconstruct(Lexeme lexeme);
 
-LexemeArr* lexemearr_create();
+LexemeArr* lexemearr_construct();
 void lexemearr_add(LexemeArr* la, Lexeme l);
-void lexemearr_remove(LexemeArr* la);
+void lexemearr_deconstruct(LexemeArr* la);
 
 #endif

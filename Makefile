@@ -1,13 +1,14 @@
 all: build
 
 CC = gcc
+DEBUGFLAGS = -g
 CFLAGS = -O2 -std=c99
 
 bd = build/
 objects = $(bd)main.o $(bd)lexer.o $(bd)lexeme.o $(bd)keywords.o $(bd)parser.o $(bd)debug.o $(bd)file.o
 
 debug: $(objects)
-	$(CC) -o sol -g $(objects)
+	$(CC) -o sol -g $(objects) $(CFLAGS) $(DEBUGFLAGS)
 
 clean:
 	rm $(bd)*.o
