@@ -38,7 +38,7 @@ static Lexeme curr()
 
 static int has_next()
 {
-	return !(lexeme_arr->arr[lexeme_position].type == END);
+	return lexeme_arr->arr[lexeme_position].type != END;
 }
 
 static void next()
@@ -79,7 +79,7 @@ static int expect(Symbol s)
 	if(g_comp_debug_mode(OUTPUT_ALL | OUTPUT_PARSER | OUTPUT_DEBUG))
 	{
 		g_error("parser.c : statement: syntax error, unexpected symbol at: ");
-		printf("%d:%d ", curr_lexeme.row, curr_lexeme.column);
+		printf("%llu:%llu ", curr_lexeme.row, curr_lexeme.column);
 		g_error(": Type: ");
 		printf("%s", TypeString[curr_sym]);
 		g_error(" Label: ");
@@ -178,7 +178,7 @@ static bool statement()
 		if(g_comp_debug_mode(OUTPUT_ALL | OUTPUT_PARSER | OUTPUT_DEBUG))
 		{
 			g_error("parser.c : statement: syntax error, unexpected symbol at: ");
-			printf("%d:%d ", curr_lexeme.row, curr_lexeme.column);
+			printf("%llu:%llu ", curr_lexeme.row, curr_lexeme.column);
 			g_error(": Type: ");
 			printf("%s", TypeString[curr_sym]);
 			g_error(" Label: ");
@@ -231,7 +231,7 @@ static void let_declaration()
 							if(g_comp_debug_mode(OUTPUT_ALL | OUTPUT_PARSER | OUTPUT_DEBUG))
 							{
 								g_error("parser.c : let_declaration: syntax error, unexpected symbol at: ");
-								printf("%d:%d ", curr_lexeme.row, curr_lexeme.column);
+								printf("%llu:%llu ", curr_lexeme.row, curr_lexeme.column);
 								g_error(": Type: ");
 								printf("%s", TypeString[curr_sym]);
 								g_error(" Label: ");
@@ -246,7 +246,7 @@ static void let_declaration()
 				if(g_comp_debug_mode(OUTPUT_ALL | OUTPUT_PARSER | OUTPUT_DEBUG))
 				{
 					g_error("parser.c : let_declaration: syntax error, unexpected symbol at: ");
-					printf("%d:%d ", curr_lexeme.row, curr_lexeme.column);
+					printf("%llu:%llu ", curr_lexeme.row, curr_lexeme.column);
 					g_error(": Type: ");
 					printf("%s", TypeString[curr_sym]);
 					g_error(" Label: ");

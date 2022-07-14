@@ -41,7 +41,7 @@ void file_deconstruct(File file)
     }
     else
         free(file.code);
-    lexemearr_remove(file.lexemearr);
+    lexemearr_deconstruct(file.lexemearr);
 }
 
 FileArr filearr_construct()
